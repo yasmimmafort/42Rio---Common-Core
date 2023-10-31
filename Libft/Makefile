@@ -28,7 +28,7 @@ BONUS = ft_lstmap_bonus.c ft_lstnew_bonus.c ft_lstiter_bonus.c \
 
 BONUS_OBJS = $(BONUS:.c=.o)
 
-CC = gcc
+CC = cc
 
 RM = rm -f
 
