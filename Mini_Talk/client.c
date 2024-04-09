@@ -1,73 +1,45 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   client.c                                           :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: yathayde <marvin@42.fr>                    +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/01/31 16:05:21 by yathayde          #+#    #+#             */
-/*   Updated: 2024/01/31 16:05:24 by yathayde         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
 
-#include <signal.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include "libft/libft.h"
+#include "minitalk.h"
 
-static void	action(int sig)
+void	transform(int pid, char sign)
 {
-	static int	received = 0;
+	int	i;
 
-	if (sig == SIGUSR1)
-		++received;
-	else
+	i = 7;
+	while (i >= 0)
 	{
-		ft_putnbr_fd(received, 1);
-		ft_putchar_fd('\n', 1);
-		exit(0);
+		if (sign & (1 << i))
+			kill(pid, SIGUSR1);
+		else
+			kill(pid, SIGUSR2);
+		usleep(500);
+		i--;
 	}
 }
 
-static void	mt_kill(int pid, char *str)
+int	main(int ac, char **av)
 {
-	int		i;
-	char	c;
+	int	i;
+	int	pid;
 
-	while (*str)
+	i = 0;
+	if (ac != 3)
 	{
-		i = 8;
-		c = *str++;
-		while (i--)
-		{
-			if (c >> i & 1)
-				kill(pid, SIGUSR2);
-			else
-				kill(pid, SIGUSR1);
-			usleep(100);
-		}
+		ft_printf("Check the syntax: ./client server-pid text-to-send\n");
+		return (0);
 	}
-	i = 8;
-	while (i--)
+	if (kill(ft_atoi(av[1]), 0) == -1)
 	{
-		kill(pid, SIGUSR1);
-		usleep(100);
+		ft_printf("Wrong pid, please check and try again!");
+		return (0);
 	}
-}
-
-int	main(int argc, char **argv)
-{
-	if (argc != 3 || !ft_strlen(argv[2]))
-		return (1);
-	ft_putstr_fd("Sent    : ", 1);
-	ft_putnbr_fd(ft_strlen(argv[2]), 1);
-	ft_putchar_fd('\n', 1);
-	ft_putstr_fd("Received: ", 1);
-	signal(SIGUSR1, action);
-	signal(SIGUSR2, action);
-	mt_kill(ft_atoi(argv[1]), argv[2]);
-	while (1)
-		pause();
+	pid = ft_atoi(av[1]);
+	i = 0;
+	while (av[2][i])
+	{
+		transform(pid, av[2][i]);
+		i++;
+	}
 	return (0);
 }

@@ -1,47 +1,45 @@
-# **************************************************************************** #
-#                                                                              #
-#                                                         :::      ::::::::    #
-#    Makefile                                           :+:      :+:    :+:    #
-#                                                     +:+ +:+         +:+      #
-#    By: yathayde <marvin@42.fr>                    +#+  +:+       +#+         #
-#                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2024/01/31 16:06:06 by yathayde          #+#    #+#              #
-#    Updated: 2024/01/31 16:06:08 by yathayde         ###   ########.fr        #
-#                                                                              #
-# **************************************************************************** #
 
+NAME	=	minitalk
 
+B_SERVER	= server_bonus.c
 
+B_CLIENT	= client_bonus.c
 
-SOURCES = server.c client.c
-OBJECTS = $(SOURCES:.c=.o)
+CLIENT	=	client
 
-CC = gcc
-CFLAGS = -Wall -Wextra -Werror
+SERVER	= 	server
 
-all: server client
+NAMELIB	=	libft.a
 
-bonus: server client
+PRINTLIB =	libftprintf.a
 
-server: server.o libft
-	$(CC) -o $@ $< -Llibft -lft
+LIBFT	=	libft/libft.a
 
-client: client.o libft
-	$(CC) -o $@ $< -Llibft -lft
+PRINTF	=	ftprintf/libftprintf.a
 
-%.o: %.c
-	$(CC) -c $(CFLAGS) $?
+all: $(CLIENT) $(SERVER) $(NAMELIB) $(PRINTLIB)
 
-libft:
-	make -C libft
+$(NAMELIB):
+	$(MAKE) -C libft/.
+	cp $(LIBFT) ./ 
+	
+$(PRINTLIB):
+	$(MAKE) -C ftprintf/.
+	cp $(PRINTF) ./
+
+$(CLIENT): $(NAMELIB) $(PRINTLIB)
+	gcc -Wall -Wextra -Werror client.c $(NAMELIB) $(PRINTLIB) -o $(CLIENT)
+
+$(SERVER): $(NAMELIB) $(PRINTLIB)
+	gcc -Wall -Wextra -Werror server.c $(NAMELIB) $(PRINTLIB) -o $(SERVER)
 
 clean:
-	rm -f $(OBJECTS)
-	make -C libft clean
-	
+	@$(MAKE) fclean -C ./libft && $(MAKE) fclean -C ./ftprintf
+
 fclean: clean
-	rm -f server client libft/libft.a
+	@rm -rf $(SERVER)
+	@rm -rf $(CLIENT)
+	@rm -rf $(NAMELIB)
+	@rm -rf $(PRINTLIB)
 
 re: fclean all
-
-.PHONY: all bonus libft clean fclean re
